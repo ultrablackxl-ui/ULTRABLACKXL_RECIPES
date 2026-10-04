@@ -20,3 +20,5 @@ python -m http.server 8000
 V0.1: технічний фундамент. Далі: повна редакційна категоризація, інгредієнти, час приготування, порції, SEO-тексти та аналітика переходів.
 
 Pages: enabled via GitHub Actions.
+
+YouTube avatar auto-sync enabled.
