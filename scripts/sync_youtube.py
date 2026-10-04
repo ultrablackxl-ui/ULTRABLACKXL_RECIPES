@@ -12,8 +12,10 @@ import unicodedata
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data" / "recipes.json"
+CHANNEL_DATA = ROOT / "data" / "channel.json"
 EDITORIAL = ROOT / "data" / "editorial.json"
 CHANNEL = "https://www.youtube.com/@ultrablackxl6205/videos"
+CHANNEL_HOME = "https://www.youtube.com/@ultrablackxl6205"
 
 CYR_MAP = {
     "а":"a","б":"b","в":"v","г":"h","ґ":"g","д":"d","е":"e","ё":"yo","є":"ye","ж":"zh","з":"z",
@@ -49,7 +51,43 @@ def guess_category(title: str) -> str:
             return cat
     return "Інше"
 
+def sync_channel_meta():
+    """Best-effort channel avatar/name sync. Never blocks recipe import."""
+    cmd = [
+        "yt-dlp", "--flat-playlist", "--dump-single-json", "--playlist-items", "1",
+        "--skip-download", "--no-warnings", CHANNEL_HOME,
+    ]
+    p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8")
+    if p.returncode or not p.stdout.strip():
+        print("Channel metadata sync skipped:", p.stderr.strip(), file=sys.stderr)
+        return
+    try:
+        meta = json.loads(p.stdout)
+    except Exception as exc:
+        print("Channel metadata parse failed:", exc, file=sys.stderr)
+        return
+    thumbs = meta.get("thumbnails") or []
+    square = []
+    for t in thumbs:
+        try:
+            w, h = int(t.get("width") or 0), int(t.get("height") or 0)
+        except Exception:
+            w = h = 0
+        if t.get("url"):
+            ratio = abs((w / h) - 1) if w and h else 99
+            square.append((ratio, -(w*h), t.get("url")))
+    avatar = sorted(square)[0][2] if square else ""
+    out = {
+        "title": meta.get("channel") or meta.get("uploader") or meta.get("title") or "UltrablackXL",
+        "channel_id": meta.get("channel_id") or meta.get("uploader_id") or "",
+        "channel_url": meta.get("channel_url") or meta.get("uploader_url") or CHANNEL_HOME,
+        "avatar": avatar,
+    }
+    CHANNEL_DATA.write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8")
+    print("Synced channel metadata; avatar:", "yes" if avatar else "no")
+
 def run():
+    sync_channel_meta()
     editorial = json.loads(EDITORIAL.read_text(encoding="utf-8")) if EDITORIAL.exists() else {}
     cmd = [
         "yt-dlp", "--flat-playlist", "--dump-json", "--skip-download",
