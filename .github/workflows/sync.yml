@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - '.github/workflows/sync.yml'
+      - 'scripts/sync_youtube.py'
   schedule:
     - cron: '17 5 * * *'
 permissions:
