@@ -1,0 +1,11 @@
+recipes/zharkoe-iz-pechenki/
+recipes/zalivnoy-pirog/
+recipes/govyazhiy-yazyk-v-bline/
+recipes/pirog-s-kuritsey/
+recipes/gribnoy-sup-s-syrom/
+recipes/sloenyy-salat-s-pechenyu/
+recipes/shampinyony-farshirovannye-kuritsey/
+recipes/kuritsa-v-karamelnom-apelsinovom-souse/
+recipes/salat-s-kopchenoy-kuritsey/
+recipes/kartoshka-v-dukhovke-so-smetanoy/
+recipes/baileys-domashniy/
