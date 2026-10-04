@@ -22,3 +22,5 @@ V0.1: технічний фундамент. Далі: повна редакці
 Pages: enabled via GitHub Actions.
 
 YouTube avatar auto-sync enabled.
+
+SEO recipe pages V1 enabled.
