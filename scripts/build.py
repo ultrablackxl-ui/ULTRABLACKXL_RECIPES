@@ -192,11 +192,11 @@ hero_visual = f'''<aside class="channelcard">
 <a class="ytbtn" href="https://www.youtube.com/@ultrablackxl6205">▶ Відкрити YouTube</a>
 </aside>'''
 
-cat_links = "".join(f'<a class="categorytile" href="category/{cat_slug(c)}/"><strong>{esc(c)}</strong><span>{sum(1 for r in recipes if (r.get("category") or "Інше")==c)} рецептів</span></a>' for c in categories)
+cat_links = "".join(f'<a class="hashtagcat" href="category/{cat_slug(c)}/">#{esc(c)}</a>' for c in categories)
 
 home = f'''<main>
 <section class="wrap hero"><div><div class="tag">ULTRABLACKXL · ВІДЕОРЕЦЕПТИ</div><h1>Прості рецепти.<br>Смачні моменти.</h1><p>Домашні рецепти без зайвої метушні. Обирай страву, відкривай відео та готуй разом з UltraBlackXL.</p><a class="ytbtn" style="display:inline-block;margin-top:8px" href="#recipes">Дивитися рецепти ↓</a></div>{hero_visual}</section>
-<section class="wrap cats"><div class="sectionhead"><div><div class="tag">ОБИРАЙ</div><h2>Категорії</h2></div></div><div class="categorygrid">{cat_links}</div></section>
+<section class="wrap cats"><div class="sectionhead"><div><div class="tag">ШВИДКИЙ ВИБІР</div><h2>Що готуємо?</h2></div></div><div class="hashtagrow">{cat_links}</div></section>
 <section class="wrap section" id="recipes"><div class="sectionhead"><div><div class="tag">КАТАЛОГ</div><h2>Усі рецепти</h2></div><div class="muted" id="count"></div></div><div class="toolbar"><input class="search" id="q" placeholder="Пошук: курка, суп, пиріг…"><div class="chips" id="chips"></div></div><div class="grid" id="grid"></div></section>
 </main><script>document.addEventListener('DOMContentLoaded',()=>initHome())</script>'''
 
