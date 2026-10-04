@@ -5,6 +5,8 @@ on:
     paths:
       - '.github/workflows/sync.yml'
       - 'scripts/sync_youtube.py'
+      - 'scripts/build.py'
+      - 'assets/app.js'
       - 'data/editorial.json'
   schedule:
     - cron: '17 5 * * *'
