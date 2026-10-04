@@ -18,10 +18,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Prepare public site
+        run: |
+          mkdir -p _site
+          for p in index.html assets data recipes robots.txt sitemap.txt; do
+            if [ -e "$p" ]; then cp -r "$p" _site/; fi
+          done
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'
+          path: '_site'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
