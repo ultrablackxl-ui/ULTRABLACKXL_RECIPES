@@ -1,8 +1,8 @@
 """Synchronize all regular videos from the UltrablackXL YouTube channel.
 
-Source is the channel's /videos tab, not /shorts, so Shorts are intentionally
-excluded. Existing editorial fields are preserved when a video can be matched
-by YouTube ID or normalized title.
+The source is the channel's /videos tab, not /shorts, so Shorts are excluded.
+Auto-generated fields are rebuilt from YouTube every run. Editorial overrides
+will live separately, so a bad automatic value can never poison later syncs.
 
 Requires: pip install -U yt-dlp
 """
@@ -17,15 +17,15 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data" / "recipes.json"
 CHANNEL = "https://www.youtube.com/@ultrablackxl6205/videos"
 
-CYR = str.maketrans({
+CYR_MAP = {
     "а":"a","б":"b","в":"v","г":"h","ґ":"g","д":"d","е":"e","ё":"yo","є":"ye","ж":"zh","з":"z",
     "и":"y","і":"i","ї":"yi","й":"y","к":"k","л":"l","м":"m","н":"n","о":"o","п":"p","р":"r",
     "с":"s","т":"t","у":"u","ф":"f","х":"kh","ц":"ts","ч":"ch","ш":"sh","щ":"shch","ъ":"",
     "ы":"y","ь":"","э":"e","ю":"yu","я":"ya",
-})
+}
 
 def translit(text: str) -> str:
-    return "".join(ch.translate(CYR) if ch.lower() in CYR else ch for ch in text.lower())
+    return "".join(CYR_MAP.get(ch, ch) for ch in (text or "").lower())
 
 def slugify(text: str, video_id: str = "") -> str:
     s = translit(unicodedata.normalize("NFKC", text or ""))
@@ -33,9 +33,6 @@ def slugify(text: str, video_id: str = "") -> str:
     if not s:
         s = "recipe"
     return f"{s[:72]}-{video_id[:8]}" if video_id else s[:80]
-
-def norm_key(text: str) -> str:
-    return re.sub(r"[^a-z0-9]+", "", translit(text or ""))
 
 def guess_category(title: str) -> str:
     t = translit(title)
@@ -46,9 +43,9 @@ def guess_category(title: str) -> str:
         ("Випічка", ["piro", "khleb", "buloc", "blin", "pitsa", "pizza", "keks"]),
         ("Десерти", ["tort", "desert", "pechen", "krem", "tiramisu", "napoleon"]),
         ("Птиця", ["kur", "indey", "kryl", "utk"]),
-        ("М’ясо", ["myas", "svinin", "govyad", "buzhen", "shashlyk", "kotlet", "pechenk", "yazyk"]),
-        ("Закуски", ["zakusk", "buter", "kanape", "rulet", "shampinon"]),
-        ("Гарніри", ["kartof", "kartopl", "ris", "grechk", "makaron"]),
+        ("М’ясо", ["myas", "svinin", "govyad", "buzhen", "shashlyk", "kotlet", "pechenk", "yazyk", "rulk"]),
+        ("Закуски", ["zakusk", "buter", "kanape", "rulet", "shampinon", "hot-dog", "khod-dog"]),
+        ("Гарніри", ["kartof", "kartopl", "batat", "ris", "grechk", "makaron"]),
         ("Напої", ["napit", "kokteyl", "limonad", "baileys", "beylis"]),
     ]
     for cat, words in rules:
@@ -66,10 +63,6 @@ def run():
         print(p.stderr, file=sys.stderr)
         sys.exit(p.returncode)
 
-    old = json.loads(DATA.read_text(encoding="utf-8")) if DATA.exists() else []
-    by_id = {x.get("youtube_id"): x for x in old if x.get("youtube_id")}
-    by_title = {norm_key(x.get("title", "")): x for x in old if x.get("title")}
-
     rows = []
     seen = set()
     for line in p.stdout.splitlines():
@@ -85,21 +78,18 @@ def run():
         if "/shorts/" in str(url):
             continue
         title = e.get("title") or vid
-        previous = by_id.get(vid) or by_title.get(norm_key(title)) or {}
-        row = {
-            "slug": previous.get("slug") or slugify(title, vid),
+        rows.append({
+            "slug": slugify(title, vid),
             "title": title,
-            "category": previous.get("category") or guess_category(title),
+            "category": guess_category(title),
             "youtube_id": vid,
             "youtube_url": f"https://www.youtube.com/watch?v={vid}",
             "thumbnail": e.get("thumbnail") or f"https://i.ytimg.com/vi/{vid}/hqdefault.jpg",
-            "description": previous.get("description") or e.get("description") or "",
+            "description": e.get("description") or "",
             "duration": e.get("duration"),
             "upload_date": e.get("upload_date"),
-            "source_url": previous.get("source_url", ""),
             "status": "published",
-        }
-        rows.append(row)
+        })
 
     if not rows:
         print("No regular videos were returned; refusing to overwrite the catalog.", file=sys.stderr)
