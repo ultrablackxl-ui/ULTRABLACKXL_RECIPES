@@ -25,7 +25,7 @@ def clean_title(title):
 def short_desc(r):
     title = clean_title(r.get("title"))
     cat = r.get("category") or "Рецепти"
-    return f'Дивіться відеорецепт «{title}» від UltraBlack XL. Категорія: {cat}. Простий формат: відкрили рецепт, увімкнули відео і готуємо разом.'
+    return f'Відеорецепт «{title}» від UltraBlack XL. Дивіться повний процес приготування у відео та готуйте разом з нами.'
 
 def fmt_duration(seconds):
     try:
@@ -149,7 +149,7 @@ for r in recipes:
 </div>
 
 <div class="twocol recipeinfo">
-<section class="box"><div class="tag">ПРО РЕЦЕПТ</div><h2>{esc(display)}</h2><p>{esc(desc)}</p><p class="muted">Повний процес приготування дивіться у відео вище. Тут не додаємо вигаданих інгредієнтів або кроків, яких немає в джерелі.</p></section>
+<section class="box"><div class="tag">ПРО РЕЦЕПТ</div><h2>{esc(display)}</h2><p>{esc(desc)}</p><p class="muted">Повний процес приготування показаний у відео вище.</p></section>
 <aside class="box"><div class="tag">НАВІГАЦІЯ</div><h2>{esc(cat)}</h2><p>Ще більше страв цієї категорії.</p><a class="ghostbtn" href="../../category/{cslug}/">Усі рецепти категорії →</a></aside>
 </div>
 
