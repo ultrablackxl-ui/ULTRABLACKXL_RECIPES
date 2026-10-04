@@ -1,10 +1,7 @@
-"""Synchronize all regular videos from the UltrablackXL YouTube channel.
+"""Synchronize all regular recipe videos from the UltrablackXL YouTube channel.
 
-The source is the channel's /videos tab, not /shorts, so Shorts are excluded.
-Auto-generated fields are rebuilt from YouTube every run. Editorial overrides
-will live separately, so a bad automatic value can never poison later syncs.
-
-Requires: pip install -U yt-dlp
+The source is the channel's /videos tab, never /shorts. Auto metadata comes
+from YouTube; stable human/editorial decisions live in data/editorial.json.
 """
 from pathlib import Path
 import subprocess
@@ -15,6 +12,7 @@ import unicodedata
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data" / "recipes.json"
+EDITORIAL = ROOT / "data" / "editorial.json"
 CHANNEL = "https://www.youtube.com/@ultrablackxl6205/videos"
 
 CYR_MAP = {
@@ -29,9 +27,7 @@ def translit(text: str) -> str:
 
 def slugify(text: str, video_id: str = "") -> str:
     s = translit(unicodedata.normalize("NFKC", text or ""))
-    s = re.sub(r"[^a-z0-9]+", "-", s).strip("-")
-    if not s:
-        s = "recipe"
+    s = re.sub(r"[^a-z0-9]+", "-", s).strip("-") or "recipe"
     return f"{s[:72]}-{video_id[:8]}" if video_id else s[:80]
 
 def guess_category(title: str) -> str:
@@ -44,7 +40,7 @@ def guess_category(title: str) -> str:
         ("Десерти", ["tort", "desert", "pechen", "krem", "tiramisu", "napoleon"]),
         ("Птиця", ["kur", "indey", "kryl", "utk"]),
         ("М’ясо", ["myas", "svinin", "govyad", "buzhen", "shashlyk", "kotlet", "pechenk", "yazyk", "rulk"]),
-        ("Закуски", ["zakusk", "buter", "kanape", "rulet", "shampinon", "hot-dog", "khod-dog"]),
+        ("Закуски", ["zakusk", "buter", "kanape", "rulet", "shampinon", "hot-dog"]),
         ("Гарніри", ["kartof", "kartopl", "batat", "ris", "grechk", "makaron"]),
         ("Напої", ["napit", "kokteyl", "limonad", "baileys", "beylis"]),
     ]
@@ -54,6 +50,7 @@ def guess_category(title: str) -> str:
     return "Інше"
 
 def run():
+    editorial = json.loads(EDITORIAL.read_text(encoding="utf-8")) if EDITORIAL.exists() else {}
     cmd = [
         "yt-dlp", "--flat-playlist", "--dump-json", "--skip-download",
         "--ignore-errors", "--no-warnings", CHANNEL,
@@ -63,8 +60,8 @@ def run():
         print(p.stderr, file=sys.stderr)
         sys.exit(p.returncode)
 
-    rows = []
-    seen = set()
+    rows, seen = [], set()
+    excluded = 0
     for line in p.stdout.splitlines():
         try:
             e = json.loads(line)
@@ -76,27 +73,33 @@ def run():
         seen.add(vid)
         url = e.get("webpage_url") or e.get("original_url") or e.get("url") or ""
         if "/shorts/" in str(url):
+            excluded += 1
             continue
-        title = e.get("title") or vid
-        rows.append({
-            "slug": slugify(title, vid),
+        edit = editorial.get(vid, {})
+        if edit.get("exclude"):
+            excluded += 1
+            continue
+        title = edit.get("title") or e.get("title") or vid
+        row = {
+            "slug": edit.get("slug") or slugify(title, vid),
             "title": title,
-            "category": guess_category(title),
+            "category": edit.get("category") or guess_category(title),
             "youtube_id": vid,
             "youtube_url": f"https://www.youtube.com/watch?v={vid}",
             "thumbnail": e.get("thumbnail") or f"https://i.ytimg.com/vi/{vid}/hqdefault.jpg",
-            "description": e.get("description") or "",
+            "description": edit.get("description") or e.get("description") or "",
             "duration": e.get("duration"),
             "upload_date": e.get("upload_date"),
             "status": "published",
-        })
+        }
+        rows.append(row)
 
     if not rows:
-        print("No regular videos were returned; refusing to overwrite the catalog.", file=sys.stderr)
+        print("No recipe videos were returned; refusing to overwrite the catalog.", file=sys.stderr)
         sys.exit(2)
 
     DATA.write_text(json.dumps(rows, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"Synced {len(rows)} regular videos from {CHANNEL}; Shorts excluded")
+    print(f"Synced {len(rows)} recipe videos; excluded {excluded} Shorts/non-recipes")
 
 if __name__ == "__main__":
     run()
