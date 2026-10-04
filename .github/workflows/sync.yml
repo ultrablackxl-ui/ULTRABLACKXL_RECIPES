@@ -30,6 +30,6 @@ jobs:
         run: |
           git config user.name "UltrablackXL Recipes Bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data/recipes.json data/channel.json index.html recipes sitemap.txt robots.txt
+          git add data/recipes.json data/channel.json index.html recipes category sitemap.txt sitemap.xml robots.txt
           git diff --cached --quiet || git commit -m "Auto-sync YouTube recipes"
           git push
