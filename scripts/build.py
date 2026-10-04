@@ -12,7 +12,7 @@ def esc(x):
 
 def shell(title, body, extra="", depth=0):
     up = "../" * depth
-    return f'''<!doctype html><html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{esc(title)} | UltrablackXL Рецепти</title><meta name="description" content="Відеорецепти UltrablackXL"><link rel="stylesheet" href="{up}assets/style.css">{extra}</head><body><header class="top"><div class="wrap nav"><a class="brand" href="{up}">UltraBlack<span>XL</span><small style="display:block;font-size:9px;letter-spacing:4px;color:#aaa">РЕЦЕПТИ</small></a><nav class="navlinks"><a href="{up}">Головна</a><a href="{up}#recipes">Рецепти</a><a href="https://www.youtube.com/@ultrablackxl6205">YouTube</a></nav><a class="ytbtn" href="https://www.youtube.com/@ultrablackxl6205?sub_confirmation=1">▶ Підписатися</a></div></header>{body}<footer class="footer"><div class="wrap">UltrablackXL Рецепти · відео відтворюються з YouTube</div></footer></body></html>'''
+    return f'''<!doctype html><html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{esc(title)} | UltrablackXL Рецепти</title><meta name="description" content="Відеорецепти UltrablackXL"><link rel="stylesheet" href="{up}assets/style.css">{extra}</head><body><header class="top"><div class="wrap nav"><a class="brand" href="{up}">UltraBlack<span>XL</span><small style="display:block;font-size:9px;letter-spacing:4px;color:#aaa">РЕЦЕПТИ</small></a><nav class="navlinks"><a href="{up}">Головна</a><a href="{up}#recipes">Рецепти</a><a href="https://www.youtube.com/@ultrablackxl6205">YouTube</a></nav><a class="ytbtn" href="https://www.youtube.com/@ultrablackxl6205?sub_confirmation=1">▶ Підписатися</a></div></header>{body}<footer class="footer"><div class="wrap">UltrablackXL Рецепти · відео відтворюються з YouTube</div></footer><script src="{up}assets/app.js"></script></body></html>'''
 
 recipes_dir = ROOT / "recipes"
 if recipes_dir.exists():
@@ -23,7 +23,16 @@ for r in recipes:
     d = recipes_dir / r["slug"]
     d.mkdir(parents=True, exist_ok=True)
     if r.get("youtube_id"):
-        player = f'''<iframe src="https://www.youtube-nocookie.com/embed/{esc(r['youtube_id'])}" title="{esc(r['title'])}" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>'''
+        player = f'''<div id="yt-player"></div><script>
+(function(){{
+  var played=false, vid={json.dumps(r['youtube_id'])}, title={json.dumps(r['title'], ensure_ascii=False)};
+  function send(name){{try{{if(window.zaraz&&typeof window.zaraz.track==='function')window.zaraz.track(name,{{video_id:vid,title:title}})}}catch(e){{}}}}
+  window.onYouTubeIframeAPIReady=function(){{
+    new YT.Player('yt-player',{{videoId:vid,playerVars:{{rel:0}},events:{{onStateChange:function(e){{if(e.data===YT.PlayerState.PLAYING&&!played){{played=true;send('youtube_play')}}}}}}}});
+  }};
+  var s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';document.head.appendChild(s);
+}})();
+</script>'''
     else:
         player = '''<div class="emptyvideo"><strong>🎬 Відео буде підв’язане автоматично</strong><span class="muted">Після синхронізації каналу тут буде оригінальний YouTube-плеєр UltrablackXL.</span></div>'''
 
