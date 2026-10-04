@@ -24,7 +24,7 @@ jobs:
           python scripts/build.py
           rm -rf _site
           mkdir -p _site
-          for p in index.html assets data recipes robots.txt sitemap.txt; do
+          for p in index.html assets data recipes api stats robots.txt sitemap.txt; do
             if [ -e "$p" ]; then
               cp -R "$p" _site/
             fi
