@@ -18,10 +18,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Build site
+        run: python scripts/build.py
       - name: Prepare public site
         run: |
           mkdir -p _site
-          for p in index.html assets data recipes robots.txt sitemap.txt; do
+          for p in index.html assets data recipes category robots.txt sitemap.txt sitemap.xml; do
             if [ -e "$p" ]; then cp -r "$p" _site/; fi
           done
       - uses: actions/configure-pages@v5
