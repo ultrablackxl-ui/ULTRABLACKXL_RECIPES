@@ -126,6 +126,8 @@ def run():
             "youtube_url": f"https://www.youtube.com/watch?v={vid}",
             "thumbnail": e.get("thumbnail") or f"https://i.ytimg.com/vi/{vid}/hqdefault.jpg",
             "description": edit.get("description") or e.get("description") or "",
+            "seo_title": edit.get("seo_title") or "",
+            "seo_description": edit.get("seo_description") or "",
             "duration": e.get("duration"),
             "upload_date": e.get("upload_date"),
             "status": "published",
