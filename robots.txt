@@ -1,2 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /stats/
+Disallow: /api/
+Sitemap: https://ultrablackxl.site.je/sitemap.xml
