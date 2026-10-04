@@ -23,3 +23,9 @@
 .player #yt-player,.player #yt-player iframe{width:100%!important;height:100%!important}
 @media(max-width:950px){.categorygrid{grid-template-columns:repeat(3,1fr)}.relatedgrid{grid-template-columns:1fr}.recipehead{grid-template-columns:1fr}.recipecover{max-height:430px}.footergrid{grid-template-columns:1fr}}
 @media(max-width:620px){.categorygrid{grid-template-columns:repeat(2,1fr)}.categoryhero h1{letter-spacing:-2px}.recipehead h1{letter-spacing:-1px}.relatedcard{grid-template-columns:100px 1fr}.relatedcard img{width:100px}.recipeactions>a{width:100%}}
+
+.hashtagrow{display:flex;flex-wrap:wrap;gap:10px 11px;margin:6px 0 10px}
+.hashtagcat{display:inline-flex;align-items:center;justify-content:center;padding:11px 15px;border:1px solid #343c44;border-radius:999px;background:#12161a;color:#eef1f3;font-weight:750;font-size:14px;transition:.18s}
+.hashtagcat:hover{transform:translateY(-2px);border-color:#68737d;background:#1a1f24;color:#fff}
+.hashtagcat::first-letter{color:var(--gold)}
+@media(max-width:560px){.hashtagrow{gap:8px}.hashtagcat{padding:10px 12px;font-size:13px}}
