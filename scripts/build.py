@@ -5,7 +5,9 @@ import shutil
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data" / "recipes.json"
+CHANNEL_DATA = ROOT / "data" / "channel.json"
 recipes = json.loads(DATA.read_text(encoding="utf-8"))
+channel = json.loads(CHANNEL_DATA.read_text(encoding="utf-8")) if CHANNEL_DATA.exists() else {}
 
 def esc(x):
     return html.escape(str(x or ""))
@@ -49,7 +51,9 @@ for r in recipes:
     extra = f'<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script>'
     (d / "index.html").write_text(shell(r["title"], body, extra, depth=2), encoding="utf-8")
 
-home = '''<main><section class="wrap hero"><div><div class="tag">ULTRABLACKXL · YOUTUBE РЕЦЕПТИ</div><h1>Прості рецепти.<br>Смачні моменти.</h1><p>Усі повноформатні відеорецепти UltrablackXL в одному зручному каталозі. Shorts не імпортуються.</p><a class="ytbtn" style="display:inline-block;margin-top:8px" href="#recipes">Дивитися рецепти ↓</a></div><div class="heroart"></div></section><section class="wrap"><div class="sectionhead"><div><div class="tag">LIVE</div><h2>Лічильники сайту</h2></div><a class="muted" href="stats/">Детальна статистика →</a></div><div class="livebar" id="live-stats"><div class="miniStat"><strong>…</strong><span>завантаження</span></div></div></section><section class="wrap section" id="recipes"><div class="sectionhead"><div><div class="tag">КАТАЛОГ</div><h2>Усі рецепти</h2></div><div class="muted" id="count"></div></div><div class="toolbar"><input class="search" id="q" placeholder="Пошук: курка, суп, пиріг…"><div class="chips" id="chips"></div></div><div class="grid" id="grid"></div></section></main><script>document.addEventListener('DOMContentLoaded',()=>initHome())</script>'''
+avatar = esc(channel.get("avatar") or "")
+hero_visual = f'''<div class="heroart heroavatar">{f'<img src="{avatar}" alt="UltrablackXL YouTube">' if avatar else '<div class="avatarfallback">UltraBlack<span>XL</span></div>'}</div>'''
+home = f'''<main><section class="wrap hero"><div><div class="tag">ULTRABLACKXL · YOUTUBE РЕЦЕПТИ</div><h1>Прості рецепти.<br>Смачні моменти.</h1><p>Усі повноформатні відеорецепти UltrablackXL в одному зручному каталозі. Shorts не імпортуються.</p><a class="ytbtn" style="display:inline-block;margin-top:8px" href="#recipes">Дивитися рецепти ↓</a></div>{hero_visual}</section><section class="wrap"><div class="sectionhead"><div><div class="tag">LIVE</div><h2>Лічильники сайту</h2></div><a class="muted" href="stats/">Детальна статистика →</a></div><div class="livebar" id="live-stats"><div class="miniStat"><strong>…</strong><span>завантаження</span></div></div></section><section class="wrap section" id="recipes"><div class="sectionhead"><div><div class="tag">КАТАЛОГ</div><h2>Усі рецепти</h2></div><div class="muted" id="count"></div></div><div class="toolbar"><input class="search" id="q" placeholder="Пошук: курка, суп, пиріг…"><div class="chips" id="chips"></div></div><div class="grid" id="grid"></div></section></main><script>document.addEventListener('DOMContentLoaded',()=>initHome())</script>'''
 (ROOT / "index.html").write_text(shell("Головна", home), encoding="utf-8")
 (ROOT / "sitemap.txt").write_text("\n".join("recipes/" + r["slug"] + "/" for r in recipes), encoding="utf-8")
 (ROOT / "robots.txt").write_text("User-agent: *\nAllow: /\n", encoding="utf-8")
