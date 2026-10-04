@@ -98,7 +98,8 @@ for r in recipes:
     d = ROOT / "recipes" / r["slug"]
     d.mkdir(parents=True, exist_ok=True)
     display = clean_title(r["title"])
-    desc = short_desc(r)
+    desc = r.get("seo_description") or short_desc(r)
+    seo_title = r.get("seo_title") or display
     canonical = abs_url(f"recipes/{r['slug']}/")
     thumb = r.get("thumbnail") or (f"https://img.youtube.com/vi/{r.get('youtube_id')}/hqdefault.jpg" if r.get("youtube_id") else "")
     duration = fmt_duration(r.get("duration"))
@@ -168,7 +169,7 @@ for r in recipes:
     if r.get("duration"):
         ld["totalTime"] = f"PT{int(r['duration'])//60}M{int(r['duration'])%60}S"
     extra = f'<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script>'
-    (d/"index.html").write_text(shell(f"{display} | Відеорецепт UltraBlackXL", body, desc, canonical, thumb, extra, depth=2), encoding="utf-8")
+    (d/"index.html").write_text(shell(f"{seo_title} | UltraBlackXL", body, desc, canonical, thumb, extra, depth=2), encoding="utf-8")
 
 # Category pages
 categories = sorted(set(r.get("category") or "Інше" for r in recipes))
