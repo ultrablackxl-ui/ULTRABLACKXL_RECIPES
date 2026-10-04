@@ -8,9 +8,6 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: infinityfree-deploy
-  cancel-in-progress: true
 
 jobs:
   deploy:
