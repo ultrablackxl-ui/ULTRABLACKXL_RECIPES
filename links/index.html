@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UltraBlack XL | Посилання</title>
+<meta name="robots" content="noindex,follow">
+<meta name="theme-color" content="#0b0d0f">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+.linkhub{min-height:100vh;display:grid;place-items:center;padding:28px 16px}
+.linkcard{width:min(520px,100%);text-align:center;background:linear-gradient(180deg,#171b1f,#0f1215);border:1px solid #2b3238;border-radius:28px;padding:30px;box-shadow:0 28px 80px #0009}
+.linkavatar{width:116px;height:116px;border-radius:50%;overflow:hidden;margin:0 auto 16px;border:4px solid rgba(255,255,255,.08);box-shadow:0 16px 42px #0009}
+.linkavatar img{width:100%;height:100%;object-fit:cover}
+.linkcard h1{font-size:34px;margin:6px 0 4px}.linkcard .sub{color:#9aa3aa;margin:0 0 24px}
+.linkbuttons{display:grid;gap:12px}.biglink{display:flex;align-items:center;justify-content:center;gap:10px;padding:16px 18px;border-radius:14px;font-weight:900;font-size:17px;border:1px solid #343c44;background:#151a1e;transition:.18s}.biglink:hover{transform:translateY(-2px);border-color:#68737d}.biglink.youtube{background:#ff1f2d;border-color:#ff1f2d;color:white}.biglink.site{background:#191e23}
+.linknote{margin-top:18px;color:#77818a;font-size:12px}
+</style>
+</head>
+<body>
+<main class="linkhub">
+  <section class="linkcard">
+    <div class="linkavatar"><img src="https://yt3.googleusercontent.com/ytc/AIdro_kE0RJIJC1PajJHJH1IhPNCWcHnQd3LckRtzwiKrJ8ukYNp=s900-c-k-c0x00ffffff-no-rj" alt="UltraBlack XL"></div>
+    <div class="tag">ПРОСТЫЕ РЕЦЕПТЫ</div>
+    <h1>UltraBlack XL</h1>
+    <p class="sub">Відеорецепти, домашня кухня та повні версії на YouTube.</p>
+    <div class="linkbuttons">
+      <a class="biglink youtube" id="yt" href="https://www.youtube.com/@ultrablackxl6205">▶ Дивитися YouTube</a>
+      <a class="biglink site" id="site" href="../?utm_source=instagram&utm_medium=bio&utm_campaign=profile">🍳 Усі рецепти</a>
+    </div>
+    <div class="linknote">Оригінальні відео UltraBlack XL</div>
+  </section>
+</main>
+<script>
+function ping(event){
+  try{fetch('../api/track.php',{method:'POST',headers:{'Content-Type':'application/json'},keepalive:true,body:JSON.stringify({event:event,page:'/links/',title:'Instagram bio',source:'instagram',utm_source:'instagram'})});}catch(e){}
+}
+ping('page_view');
+document.getElementById('yt').addEventListener('click',()=>ping('youtube_outbound_click'));
+document.getElementById('site').addEventListener('click',()=>ping('recipe_open'));
+</script>
+</body>
+</html>
