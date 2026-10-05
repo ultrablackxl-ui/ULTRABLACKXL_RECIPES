@@ -23,7 +23,7 @@ jobs:
       - name: Prepare public site
         run: |
           mkdir -p _site
-          for p in index.html assets data recipes category robots.txt sitemap.txt sitemap.xml; do
+          for p in index.html assets data recipes category links robots.txt sitemap.txt sitemap.xml; do
             if [ -e "$p" ]; then cp -r "$p" _site/; fi
           done
       - uses: actions/configure-pages@v5
